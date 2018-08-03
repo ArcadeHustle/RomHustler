@@ -85,6 +85,13 @@ def dissect(rom)
 	return htmldata + "<br> --------------------------------------------------------------------------------------------------- <br><br>"
 end
 
+class ROMRUNNER < WEBrick::HTTPServlet::AbstractServlet
+ def do_GET(req, res)
+        p "Req #{req.unparsed_uri}"
+ end
+end
+
+
 class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
  def do_GET(req, res)
         p "Req #{req.unparsed_uri}"
@@ -98,7 +105,8 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 			naomi1files = Dir.glob("*").sort_by(&:downcase)
 			naomi1files.each{|rom|
 				p "Dissecting #{rom}"
-				html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
+				html += "<a href='" + req.unparsed_uri + rom + "'>Download: " + rom + "</a><br>"
+				html += "<a href='" + "/execute" + req.unparsed_uri + rom + "'>Execute: " + rom + "</a><br>"
 				html += dissect(rom)				
 			}
 		end
@@ -111,7 +119,8 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/Naomi2") do
 			naomi2files = Dir.glob("*").sort_by(&:downcase)
 			naomi2files.each{|rom|
-                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
+				html += "<a href='" + req.unparsed_uri + rom + "'>Download: " + rom + "</a><br>"
+				html += "<a href='" + "/execute" + req.unparsed_uri + rom + "'>Execute: " + rom + "</a><br>"
 				html += dissect(rom)
                         }
 		end
@@ -124,7 +133,8 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/AtomisWave") do
 			atomiswavefiles = Dir.glob("*").sort_by(&:downcase)
 			atomiswavefiles.each{|rom|
-                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
+				html += "<a href='" + req.unparsed_uri + rom + "'>Download: " + rom + "</a><br>"
+				html += "<a href='" + "/execute" + req.unparsed_uri + rom + "'>Execute: " + rom + "</a><br>"
 				html += dissect(rom)
                         }
 		end
@@ -137,7 +147,8 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/Chihiro") do
 			chihirofiles = Dir.glob("*").sort_by(&:downcase)
 			chihirofiles.each{|rom|
-                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
+				html += "<a href='" + req.unparsed_uri + rom + "'>Download: " + rom + "</a><br>"
+				html += "<a href='" + "/execute" + req.unparsed_uri + rom + "'>Execute: " + rom + "</a><br>"
                         }
 		end
                 html += "</body></html>"
@@ -149,7 +160,8 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/Firmware") do
 			firmwarefiles = Dir.glob("*").sort_by(&:downcase)
 			firmwarefiles.each{|rom|
-                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
+				html += "<a href='" + req.unparsed_uri + rom + "'>Download: " + rom + "</a><br>"
+				html += "<a href='" + "/execute" + req.unparsed_uri + rom + "'>Execute: " + rom + "</a><br>"
 				html += dissect(rom)
                         }
 		end
@@ -181,6 +193,7 @@ class ROMS < HTTPServlet::AbstractServlet
 end
 
 trap("INT"){ s.shutdown }
+s.mount("/execute", ROMRUNNER)
 s.mount("/roms", ROMFILEZ, "RomBINS")
 s.mount("/", ROMS)
 s.start
