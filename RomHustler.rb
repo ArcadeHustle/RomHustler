@@ -112,7 +112,7 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 			naomi2files = Dir.glob("*").sort_by(&:downcase)
 			naomi2files.each{|rom|
                                 html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
-				dissect(rom)
+				html += dissect(rom)
                         }
 		end
                 html += "</body></html>"
@@ -125,7 +125,7 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 			atomiswavefiles = Dir.glob("*").sort_by(&:downcase)
 			atomiswavefiles.each{|rom|
                                 html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
-				dissect(rom)
+				html += dissect(rom)
                         }
 		end
                 html += "</body></html>"
@@ -133,7 +133,7 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
                 res['Content-Type'] = "text/html"
 
         elsif req.unparsed_uri == "/roms/Chihiro/"
-                html = "<html><body>Chihiro<br>" + "<a href='../../'>..</a><br>"
+                html = "<html><body>Chihiro<br>Currently unable to parse Chihiro roms to display more data<br>" + "<a href='../../'>..</a><br>"
 		Dir.chdir("RomBINS/Chihiro") do
 			chihirofiles = Dir.glob("*").sort_by(&:downcase)
 			chihirofiles.each{|rom|
@@ -150,7 +150,7 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 			firmwarefiles = Dir.glob("*").sort_by(&:downcase)
 			firmwarefiles.each{|rom|
                                 html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
-				dissect(rom)
+				html += dissect(rom)
                         }
 		end
                 html += "</body></html>"
