@@ -1,7 +1,3 @@
-# RomHustler by Charlie Hustle
-# Sega Netboot web interface for managing multiple machines. 
-# Intended for use with Chihiro, Naomi1, Naomi2, and Triforce
-
 require 'webrick'
 include WEBrick
 
@@ -14,16 +10,16 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
  def do_GET(req, res)
         p "Req #{req.unparsed_uri}"
 	Dir.chdir("RomBINS") do
-		rombinfiles = Dir.glob("*")
-		p rombinfiles
+		rombinfiles = Dir.glob("*").sort_by(&:downcase)
 	end
 
         if req.unparsed_uri == "/roms/Naomi1/"
                 html = "<html><body>Naomi1<br>"
 		Dir.chdir("RomBINS/Naomi1") do
-			naomi1files = Dir.glob("*")
-			p naomi1files
-			html += naomi1files.to_s
+			naomi1files = Dir.glob("*").sort_by(&:downcase)
+			naomi1files.each{|rom|
+				html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+			}
 		end
                 html += "</body></html>"
                 res.body = html
@@ -32,9 +28,10 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
         elsif req.unparsed_uri == "/roms/Naomi2/"
                 html = "<html><body>Naomi2<br>"
 		Dir.chdir("RomBINS/Naomi2") do
-			naomi2files = Dir.glob("*")
-			p naomi2files
-			html += naomi2files.to_s
+			naomi2files = Dir.glob("*").sort_by(&:downcase)
+			naomi2files.each{|rom|
+                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+                        }
 		end
                 html += "</body></html>"
                 res.body = html
@@ -43,9 +40,10 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
         elsif req.unparsed_uri == "/roms/AtomisWave/"
                 html = "<html><body>AtomisWave<br>"
 		Dir.chdir("RomBINS/AtomisWave") do
-			atomiswavefiles = Dir.glob("*")
-			p atomiswavefiles
-			html += atomiswavefiles.to_s
+			atomiswavefiles = Dir.glob("*").sort_by(&:downcase)
+			atomiswavefiles.each{|rom|
+                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+                        }
 		end
                 html += "</body></html>"
                 res.body = html
@@ -54,9 +52,10 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
         elsif req.unparsed_uri == "/roms/Chihiro/"
                 html = "<html><body>Chihiro<br>"
 		Dir.chdir("RomBINS/Chihiro") do
-			chihirofiles = Dir.glob("*")
-			p chihirofiles
-			html += chihirofiles.to_s
+			chihirofiles = Dir.glob("*").sort_by(&:downcase)
+			chihirofiles.each{|rom|
+                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+                        }
 		end
                 html += "</body></html>"
                 res.body = html
@@ -65,9 +64,10 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
         elsif req.unparsed_uri == "/roms/Firmware/"
                 html = "<html><body>Firmware<br>"
 		Dir.chdir("RomBINS/Firmware") do
-			firmwarefiles = Dir.glob("*")
-			p firmwarefiles
-			html += firmwarefiles.to_s
+			firmwarefiles = Dir.glob("*").sort_by(&:downcase)
+			firmwarefiles.each{|rom|
+                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+                        }
 		end
                 html += "</body></html>"
                 res.body = html
