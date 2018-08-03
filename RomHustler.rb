@@ -1,3 +1,4 @@
+# Dump Rom Detail, and Serve Box Art from: https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/
 require 'webrick'
 include WEBrick
 
@@ -9,61 +10,79 @@ s = HTTPServer.new(
 def dissect(rom)
 	require 'hexdump'
 
+	htmldata = ""
 	romdata = File.binread(rom,880)
-	puts "Reading values from " + rom + ":\n"
-
+	puts  "Reading values from " + rom + "\n"
+	tmpout = ""	
 	# Only 16 bytes here 
 	# NAOMI header
-	puts "-----------------------------------------------------------------------------\n"
-	puts "Platform"
-	Hexdump.dump(romdata[0..15])
+	htmldata +=  "<br>Platform<br>"
+	Hexdump.dump(romdata[0..15], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += tmpout
 
 	# Print out 32 bytes at a time from now on 
 	# Company Name
-	puts "-----------------------------------------------------------------------------\n"
-	puts "Company"
-	Hexdump.dump(romdata[16..47])
+	htmldata +=  "<br>Company<br>"
+	Hexdump.dump(romdata[16..47], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += tmpout
 
+	htmldata +=  "<br>Game Name by region"
 	# Game Name (JAPAN)
-	puts "-----------------------------------------------------------------------------\n"
-	puts "Game Name by region"
-	Hexdump.dump(romdata[48..79])
+	Hexdump.dump(romdata[48..79], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += "<br>JAPAN<BR>" + tmpout
 	# Game Name (USA)
-	Hexdump.dump(romdata[80..111])
+	Hexdump.dump(romdata[80..111], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += "<br>USA<BR>" + tmpout
 	# Game Name (EXPORT/EURO)
-	Hexdump.dump(romdata[112..143])
+	Hexdump.dump(romdata[112..143], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += "<br>EURO<BR>" + tmpout
 	# Game Name (KOREA/ASIA)
-	Hexdump.dump(romdata[144..175])
+	Hexdump.dump(romdata[144..175], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += "<br>KOREA/ASIA<br>" + tmpout
 	# Game Name (AUSTRALIA)
-	Hexdump.dump(romdata[176..207])
+	Hexdump.dump(romdata[176..207], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += "<br>AUSTRALIA<BR>" + tmpout
 	# Game Name (SAMPLE GAME / RESERVED 1 / RESERVED ?)
-	Hexdump.dump(romdata[208..239])
+	Hexdump.dump(romdata[208..239], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += "<br>RESERVED 1<br>" + tmpout
 	# Game Name (SAMPLE GAME / RESERVED 2 / RESERVED !)
-	Hexdump.dump(romdata[240..271])
+	Hexdump.dump(romdata[240..271], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += "<br>RESERVED 2<br>" + tmpout
 	# Game Name (SAMPLE GAME / RESERVED 3 / RESERVED @)
-	Hexdump.dump(romdata[272..303])
+	Hexdump.dump(romdata[272..303], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += "<br>RESERVED 3<br>" + tmpout
 
 	# Game ID
-	puts "-----------------------------------------------------------------------------\n"
-	puts "Game ID"
-	Hexdump.dump(romdata[304..335])
+	htmldata +=  "<br>Game ID<br>"
+	Hexdump.dump(romdata[304..335], :output => tmpout, :ascii => true)
+	tmpout = tmpout.gsub("\n","<br>")
+	htmldata += tmpout
 
 	# Entry Point
-	puts "-----------------------------------------------------------------------------\n"
-	puts "Entry Point: " + romdata[420..423].unpack('H*').to_s
+	htmldata +=  "<br>Entry Point: " + romdata[420..423].unpack('H*').to_s + "<br>"
 
 	# 0x360 is magic... aka 864 in binary 
-	puts "-----------------------------------------------------------------------------\n"
-	puts "ROM Capacity"
+	htmldata +=  "<br>ROM Capacity<br>" 
 	capacity1 = romdata[864..867]
 	capacity2 = romdata[868..871]
 	capacity3 = romdata[872..875]
 	capacity4 = romdata[876..879]
-	puts "Start: " + capacity1.unpack('h*').to_s
-	puts "End: " + capacity2.unpack('h*').to_s
-	puts "Ram address: " + capacity3.unpack('h*').to_s
-	#puts capacity4.unpack('h*')
-
+	htmldata +=  "Start: " + capacity1.unpack('h*').to_s + "<br>"
+	htmldata +=  "End: " + capacity2.unpack('h*').to_s + "<br>"
+	htmldata +=  "Ram address: " + capacity3.unpack('h*').to_s + "<br>"
+	#htmldata +=  capacity4.unpack('h*')
+	
+	return htmldata + "<br> --------------------------------------------------------------------------------------------------- <br><br>"
 end
 
 class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
@@ -78,8 +97,9 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/Naomi1") do
 			naomi1files = Dir.glob("*").sort_by(&:downcase)
 			naomi1files.each{|rom|
-				html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
-				dissect(rom)				
+				p "Dissecting #{rom}"
+				html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
+				html += dissect(rom)				
 			}
 		end
                 html += "</body></html>"
@@ -91,7 +111,7 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/Naomi2") do
 			naomi2files = Dir.glob("*").sort_by(&:downcase)
 			naomi2files.each{|rom|
-                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
 				dissect(rom)
                         }
 		end
@@ -104,7 +124,7 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/AtomisWave") do
 			atomiswavefiles = Dir.glob("*").sort_by(&:downcase)
 			atomiswavefiles.each{|rom|
-                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
 				dissect(rom)
                         }
 		end
@@ -117,7 +137,7 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/Chihiro") do
 			chihirofiles = Dir.glob("*").sort_by(&:downcase)
 			chihirofiles.each{|rom|
-                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
                         }
 		end
                 html += "</body></html>"
@@ -129,7 +149,7 @@ class ROMFILEZ < WEBrick::HTTPServlet::FileHandler
 		Dir.chdir("RomBINS/Firmware") do
 			firmwarefiles = Dir.glob("*").sort_by(&:downcase)
 			firmwarefiles.each{|rom|
-                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a></br>"
+                                html += "<a href='" + req.unparsed_uri + rom + "'>" + rom + "</a><br>"
 				dissect(rom)
                         }
 		end
