@@ -207,23 +207,29 @@ end
 class ROMS < HTTPServlet::AbstractServlet
  def do_GET(req, res)
         if req.unparsed_uri == "/"
-		# AtomisWave  Chihiro Firmware  Naomi1  Naomi2  Triforce
-		html = "<html><body><a href='/roms/Naomi1'>Naomi1 Roms</a><br>"
-		html += "<a href='/roms/Naomi2'>Naomi2 Roms</a></body></html><br>"
-		html += "<a href='/roms/AtomisWave'>AtomisWave Roms</a></body></html><br>"
-		html += "<a href='/roms/Chihiro'>Chihiro Roms</a></body></html><br>"
-		html += "<a href='/roms/Firmware'>Firmware Roms</a></body></html><br>"
+		html = "<html><body>"
+		html += "<br>Select the ROM type<br>"
+		html += "<form action=\"/\" method=\"get\"><select>"
+		["AtomisWave","Chihiro","Naomi1","Naomi2","Triforce","Firmware"].each{ |type|
+			html += "<option value=\"#{type}\">#{type}</option>"
+		}
+		html += "</select>"
+
 		html += "<br>Select a NetDIMM based DHCP host<br>"
 		html += "<select name='NetDimm'>"
-
 		get_dhcp_hosts().each{ |host|
 			html += "<option value='#{host[1]}-#{host[0]}'>#{host[1]}</option>"
 		}
-
-		html += "</select>"
+		html += "</select><input type=\"submit\" value=\"Submit\"></form>"
 		html += "</body></html>"
         	res.body = html
         	res['Content-Type'] = "text/html"
+        elsif req.unparsed_uri =~ /NetDimm/
+                html = "<html><body>"
+                html += "<a href='/'>..</a><br>Pushing rom to host<br>"
+		html += "</body></html>"
+                res.body = html
+                res['Content-Type'] = "text/html"
 	end
  end
 end
