@@ -1,5 +1,7 @@
 # Dump Rom Detail, and Serve Box Art from: https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/
 require 'webrick'
+require 'uri'
+require 'hexdump'
 include WEBrick
 
 s = HTTPServer.new( 
@@ -22,7 +24,6 @@ def get_dhcp_hosts()
 	return hosts
 end
 def dissect(rom)
-	require 'hexdump'
 
 	htmldata = ""
 	romdata = File.binread(rom,880)
@@ -101,21 +102,28 @@ end
 
 class ROMRUNNER < WEBrick::HTTPServlet::AbstractServlet
  def do_GET(req, res)
-        ip = "192.168.1.95"
-	rompath = "./" + req.path_info.gsub('roms', 'RomBINS')
-	puts rompath
+	# /execute?RomBin=AtomisWave%2FAW-GuiltyGearIsuka.bin&NetDimm=192.168.1.95-00%3Ad0%3Af1%3A01%3Ade%3A56
+	cleanurl = URI.decode(req.unparsed_uri).split("=")
+	# ["/execute?RomBin", "AtomisWave/AW-GuiltyGearIsuka.bin&NetDimm", "192.168.1.191-00:d0:f1:02:1e:4e"]
+
+	rompath = "RomBINS/" + cleanurl[1].split("&")[0] 
+	p rompath
+        ip = cleanurl[2].split("-")[0] 
 
 	if File.file?(rompath)
 		puts "Rom file present... "
 		parent_pid = Process.spawn("./netboot_upload_tool", "#{ip}", "#{rompath}")
+		html = "<html><body>Naomi1<br>" + "<a href='../../../'>..</a><br>"
+		html += "./#{rompath} launched with pid: #{parent_pid}"
+	        res.body = html
+	        res['Content-Type'] = "text/html"
 	else
-		puts "No rom file!"
+		html = "<html><body>Naomi1<br>" + "<a href='../../../'>..</a><br>"
+		html += "No rom file!</html>"
+        	res.body = html
+        	res['Content-Type'] = "text/html"
 	end
 
-	html = "<html><body>Naomi1<br>" + "<a href='../../../'>..</a><br>"
-	html += "./#{rompath} launched with pid: #{parent_pid}"
-        res.body = html
-        res['Content-Type'] = "text/html"
  end
 end
 
@@ -209,7 +217,7 @@ class ROMS < HTTPServlet::AbstractServlet
         if req.unparsed_uri == "/"
 		html = "<html><body>"
 		html += "<br>Select the ROM type<br>"
-		html += "<form action=\"/\" method=\"get\"><select name='RomBin'>"
+		html += "<form action=\"/execute\" method=\"get\"><select name='RomBin'>"
                 Dir.chdir("RomBINS/") do
                         files = Dir.glob("*/*").sort_by(&:downcase)
                         files.each{|rom|
