@@ -209,10 +209,13 @@ class ROMS < HTTPServlet::AbstractServlet
         if req.unparsed_uri == "/"
 		html = "<html><body>"
 		html += "<br>Select the ROM type<br>"
-		html += "<form action=\"/\" method=\"get\"><select>"
-		["AtomisWave","Chihiro","Naomi1","Naomi2","Triforce","Firmware"].each{ |type|
-			html += "<option value=\"#{type}\">#{type}</option>"
-		}
+		html += "<form action=\"/\" method=\"get\"><select name='RomBin'>"
+                Dir.chdir("RomBINS/") do
+                        files = Dir.glob("*/*").sort_by(&:downcase)
+                        files.each{|rom|
+	                	html += "<option value=\"#{rom}\">#{rom}</option>"
+                        }
+                end
 		html += "</select>"
 
 		html += "<br>Select a NetDIMM based DHCP host<br>"
@@ -220,10 +223,12 @@ class ROMS < HTTPServlet::AbstractServlet
 		get_dhcp_hosts().each{ |host|
 			html += "<option value='#{host[1]}-#{host[0]}'>#{host[1]}</option>"
 		}
+
 		html += "</select><input type=\"submit\" value=\"Submit\"></form>"
 		html += "</body></html>"
         	res.body = html
         	res['Content-Type'] = "text/html"
+
         elsif req.unparsed_uri =~ /NetDimm/
                 html = "<html><body>"
                 html += "<a href='/'>..</a><br>Pushing rom to host<br>"
