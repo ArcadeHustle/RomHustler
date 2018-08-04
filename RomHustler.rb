@@ -7,6 +7,20 @@ s = HTTPServer.new(
 :DocumentRoot     => "RomBINS" 
 )
 
+def get_dhcp_hosts()
+	#1533358708 00:d0:f1:01:de:56 192.168.1.95 * 01:00:d0:f1:01:de:56
+	#1533360065 00:d0:f1:02:1e:4e 192.168.1.191 * 01:00:d0:f1:02:1e:4e
+
+	dhcp = File.read("/var/lib/misc/dnsmasq.leases")
+
+	hosts = Array.new
+	dhcp.split("\n").each{ |target|
+        	if target =~  /00:d0:f1/
+                	hosts <<  [target.split()[1], target.split()[2]]
+        	end
+	}
+	return hosts
+end
 def dissect(rom)
 	require 'hexdump'
 
@@ -199,6 +213,10 @@ class ROMS < HTTPServlet::AbstractServlet
 		html += "<a href='/roms/AtomisWave'>AtomisWave Roms</a></body></html><br>"
 		html += "<a href='/roms/Chihiro'>Chihiro Roms</a></body></html><br>"
 		html += "<a href='/roms/Firmware'>Firmware Roms</a></body></html><br>"
+		html += "<br>Running NetDIMM based DHCP hosts<br>"
+		get_dhcp_hosts().each{ |host|
+			html += "Mac: #{host[0]} IP: #{host[1]}<br>"
+		}
 		html += "</body></html>"
         	res.body = html
         	res['Content-Type'] = "text/html"
@@ -211,5 +229,4 @@ s.mount("/execute", ROMRUNNER)
 s.mount("/roms", ROMFILEZ, "RomBINS")
 s.mount("/", ROMS)
 s.start
-
 
