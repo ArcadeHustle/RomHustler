@@ -213,10 +213,14 @@ class ROMS < HTTPServlet::AbstractServlet
 		html += "<a href='/roms/AtomisWave'>AtomisWave Roms</a></body></html><br>"
 		html += "<a href='/roms/Chihiro'>Chihiro Roms</a></body></html><br>"
 		html += "<a href='/roms/Firmware'>Firmware Roms</a></body></html><br>"
-		html += "<br>Running NetDIMM based DHCP hosts<br>"
+		html += "<br>Select a NetDIMM based DHCP host<br>"
+		html += "<select name='NetDimm'>"
+
 		get_dhcp_hosts().each{ |host|
-			html += "Mac: #{host[0]} IP: #{host[1]}<br>"
+			html += "<option value='#{host[1]}-#{host[0]}'>#{host[1]}</option>"
 		}
+
+		html += "</select>"
 		html += "</body></html>"
         	res.body = html
         	res['Content-Type'] = "text/html"
