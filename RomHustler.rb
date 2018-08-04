@@ -87,7 +87,21 @@ end
 
 class ROMRUNNER < WEBrick::HTTPServlet::AbstractServlet
  def do_GET(req, res)
-        p "Req #{req.unparsed_uri}"
+        ip = "192.168.1.95"
+	rompath = "./" + req.path_info.gsub('roms', 'RomBINS')
+	puts rompath
+
+	if File.file?(rompath)
+		puts "Rom file present... "
+		parent_pid = Process.spawn("./netboot_upload_tool", "#{ip}", "#{rompath}")
+	else
+		puts "No rom file!"
+	end
+
+	html = "<html><body>Naomi1<br>" + "<a href='../../../'>..</a><br>"
+	html += "./#{rompath} launched with pid: #{parent_pid}"
+        res.body = html
+        res['Content-Type'] = "text/html"
  end
 end
 
