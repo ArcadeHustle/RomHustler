@@ -9,6 +9,18 @@ s = HTTPServer.new(
 :DocumentRoot     => "RomBINS" 
 )
 
+def get_running_netboots()
+	ps = %x[ps -ax]
+        processes = Array.new
+        ps.split("\n").each{ |target|
+                if target =~  /netboot_upload_tool/
+                        processes <<  target
+                end
+        }
+	p processes
+        return processes	
+end
+
 def get_dhcp_hosts()
 	#1533358708 00:d0:f1:01:de:56 192.168.1.95 * 01:00:d0:f1:01:de:56
 	#1533360065 00:d0:f1:02:1e:4e 192.168.1.191 * 01:00:d0:f1:02:1e:4e
@@ -124,6 +136,9 @@ class ROMRUNNER < WEBrick::HTTPServlet::AbstractServlet
         	res['Content-Type'] = "text/html"
 	end
 
+	# Once rom is run, add PID, host, and IF game is not rebootable, or IF game is known to change IP
+	# Store in SQLite? or Serialize?
+	# https://www.arcade-projects.com/forums/index.php?thread/5255-games-that-reassign-ip-address-after-netbooting/&pageNo=1
  end
 end
 
@@ -233,6 +248,7 @@ class ROMS < HTTPServlet::AbstractServlet
 		}
 
 		html += "</select><input type=\"submit\" value=\"Submit\"></form>"
+		html += "<br>" + get_running_netboots().to_s + "<br>"
 		html += "</body></html>"
         	res.body = html
         	res['Content-Type'] = "text/html"
