@@ -114,7 +114,17 @@ end
 
 class ROMKILLER < WEBrick::HTTPServlet::AbstractServlet
  def do_GET(req, res)
-	p req
+	cleanurl = URI.decode(req.unparsed_uri).split("=")
+	# ["/kill?pidtokill", "13488+pts/1++++S++++++0:00+./netboot_upload_tool+192.168.1.191+RomBINS/AtomisWave/AW-MetalSlug6.bin"]
+	pid = cleanurl[1].split("+")[0]
+	host =  cleanurl[1].split("/")[2].split("+")[1]
+	rombin = cleanurl[1].split("/")[4]
+        html = "<html><body>"
+        html += "<a href='/'>..</a><br>Killing pid: #{pid} #{rombin} running on #{host}<br>"
+	html += "</body></html>"
+        res.body = html
+        res['Content-Type'] = "text/html"
+	%x[kill -9 #{pid}]
  end
 end
 
@@ -123,9 +133,18 @@ class ROMRUNNER < WEBrick::HTTPServlet::AbstractServlet
 	# /execute?RomBin=AtomisWave%2FAW-GuiltyGearIsuka.bin&NetDimm=192.168.1.95-00%3Ad0%3Af1%3A01%3Ade%3A56
 	cleanurl = URI.decode(req.unparsed_uri).split("=")
 	# ["/execute?RomBin", "AtomisWave/AW-GuiltyGearIsuka.bin&NetDimm", "192.168.1.191-00:d0:f1:02:1e:4e"]
+	if cleanurl[2] =~ /manual/
+		puts "found manual in clean url"
+		ip = cleanurl[3].split("&")[0]
+		port = 10703 # Can't currently be changed
+	else
+		puts "found nothing"
+	        ip = cleanurl[2].split("-")[0] 
+	end
+	# Need to check for manual entries
+	# http://192.168.1.252/execute?RomBin=blank&NetDimm=manual&host=10.0.0.1&port=10703 -> /
 
 	rompath = "RomBINS/" + cleanurl[1].split("&")[0] 
-        ip = cleanurl[2].split("-")[0] 
 
 	if File.file?(rompath)
 		puts "Rom file present... "
