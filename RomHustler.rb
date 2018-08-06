@@ -182,12 +182,17 @@ class ROMS < HTTPServlet::AbstractServlet
 		html += "<br>Select the Platform type and game ROM<br>"
 		html += "<form action=\"/execute\" method=\"get\">" 
 		html += "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js\" type=\"text/javascript\"></script>"
-		html += "<select name='RomBin' onchange=\"$('#imageToSwap').attr('src', this.options[this.selectedIndex].value + '.jpg');\">"
+		# Use Art from https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/?do=download&r=498051&confirm=1&t=1&csrfKey=5dc466a3541f0391d1332824804d3db5, https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/
+		html += "<select name='RomBin' onchange=\"$('#imageToSwap').attr('src', '/roms/' + this.options[this.selectedIndex].value + '.jpg');\">"
 		html += "<option value='blank'></option>"
                 Dir.chdir("RomBINS/") do
                         files = Dir.glob("*/*").sort_by(&:downcase)
                         files.each{|rom|
-	                	html += "<option value=\"#{rom}\">#{rom}</option>"
+				if rom =~ /.jpg/
+					p "nope"
+				else
+		                	html += "<option value=\"#{rom}\">#{rom}</option>"
+				end
                         }
                 end
 		html += "</select>"
