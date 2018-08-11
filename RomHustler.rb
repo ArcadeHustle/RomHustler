@@ -1,4 +1,6 @@
 # Dump Rom Detail, and Serve Box Art from: https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/
+# Rom Files can be collected here: https://mega.nz/#!dEgUDQ5Y!wZjZr9U5DTFRWmH15VmHlGMplGUJVHHFoTM8UnXuseE
+
 require 'webrick'
 require 'uri'
 require 'hexdump'
@@ -148,6 +150,15 @@ class ROMRUNNER < WEBrick::HTTPServlet::AbstractServlet
 
 	if File.file?(rompath)
 		puts "Rom file present... "
+
+		get_running_netboots().each{ |running|
+			if running =~ /#{ip}/
+				killpid = running.split(" ")[0]
+				%x[kill -9 #{killpid}]
+			end
+			puts "Addempted to kill #{killpid}"
+		}
+
 		parent_pid = Process.spawn("./netboot_upload_tool", "#{ip}", "#{rompath}")
 		html = "<html><body>" + "<a href='../../../'>..</a><br>"
 		html += "./#{rompath} launched with pid: #{parent_pid}"
@@ -182,7 +193,8 @@ class ROMS < HTTPServlet::AbstractServlet
 		html += "<br>Select the Platform type and game ROM<br>"
 		html += "<form action=\"/execute\" method=\"get\">" 
 		html += "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js\" type=\"text/javascript\"></script>"
-		# Use Art from https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/?do=download&r=498051&confirm=1&t=1&csrfKey=5dc466a3541f0391d1332824804d3db5, https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/
+		# Use Art from https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/
+		# https://emumovies.com/files/file/1965-atomiswave-flyers/
 		html += "<select name='RomBin' onchange=\"$('#imageToSwap').attr('src', '/roms/' + this.options[this.selectedIndex].value + '.jpg');\">"
 		html += "<option value='blank'></option>"
                 Dir.chdir("RomBINS/") do
