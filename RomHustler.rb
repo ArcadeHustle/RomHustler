@@ -1,5 +1,5 @@
-# Dump Rom Detail, and Serve Box Art from: https://emumovies.com/files/file/3119-sega-naomi-2d-boxes-with-discs-151/
-# Rom Files can be collected here: https://mega.nz/#!dEgUDQ5Y!wZjZr9U5DTFRWmH15VmHlGMplGUJVHHFoTM8UnXuseE
+# Requires patched netboot_upload_tool
+# https://github.com/ArcadeHustle/naomi_netboot_upload.git
 
 require 'webrick'
 require 'uri'
@@ -135,13 +135,16 @@ class ROMRUNNER < WEBrick::HTTPServlet::AbstractServlet
 	# /execute?RomBin=AtomisWave%2FAW-GuiltyGearIsuka.bin&NetDimm=192.168.1.95-00%3Ad0%3Af1%3A01%3Ade%3A56
 	cleanurl = URI.decode(req.unparsed_uri).split("=")
 	# ["/execute?RomBin", "AtomisWave/AW-GuiltyGearIsuka.bin&NetDimm", "192.168.1.191-00:d0:f1:02:1e:4e"]
+	p cleanurl
+	# ["/execute?RomBin", "AtomisWave/ftspeed.bin&NetDimm", "manual&host", "192.168.1.197&port", "10703"]
 	if cleanurl[2] =~ /manual/
 		puts "found manual in clean url"
 		ip = cleanurl[3].split("&")[0]
-		port = 10703 # Can't currently be changed
+		port = cleanurl[4]
 	else
 		puts "found nothing"
 	        ip = cleanurl[2].split("-")[0] 
+		port = cleanurl[4]
 	end
 	# Need to check for manual entries
 	# http://192.168.1.252/execute?RomBin=blank&NetDimm=manual&host=10.0.0.1&port=10703 -> /
@@ -159,7 +162,7 @@ class ROMRUNNER < WEBrick::HTTPServlet::AbstractServlet
 			puts "Addempted to kill #{killpid}"
 		}
 
-		parent_pid = Process.spawn("./netboot_upload_tool", "#{ip}", "#{rompath}")
+		parent_pid = Process.spawn("./netboot_upload_tool", "#{ip}", "#{port}","#{rompath}")
 		html = "<html><body>" + "<a href='../../../'>..</a><br>"
 		html += "./#{rompath} launched with pid: #{parent_pid}"
 	        res.body = html
