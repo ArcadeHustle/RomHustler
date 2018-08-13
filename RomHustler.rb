@@ -191,7 +191,8 @@ end
 class ROMS < HTTPServlet::AbstractServlet
  def do_GET(req, res)
         if req.unparsed_uri == "/"
-		html = "<html><body>"
+		html = "<html><body><div id='rs-app'></div></body></html>"
+=begin
 		html += "<br><img id=\"imageToSwap\" src=\"https://image.spreadshirtmedia.com/image-server/v1/compositions/1100114503/views/1,width=300,height=300,appearanceId=1,version=1524725084.jpg\" height=\"300\" width=\"300\">"
 		html += "<br>Select the Platform type and game ROM<br>"
 		html += "<form action=\"/execute\" method=\"get\">" 
@@ -244,9 +245,11 @@ class ROMS < HTTPServlet::AbstractServlet
         elsif req.unparsed_uri =~ /NetDimm/
                 html = "<html><body>"
                 html += "<a href='/'>..</a><br>Pushing rom to host<br>"
-		html += "</body></html>"
+=end
+		html += "<script src=\"./ui/bundle.js\"></body></html>"
                 res.body = html
                 res['Content-Type'] = "text/html"
+
 	end
  end
 end

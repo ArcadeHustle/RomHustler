@@ -1,0 +1,18 @@
+<div class="md-layout md-gutter">
+    <div class="md-layout-item">
+        <md-field>
+            <label>ROM</label>
+            <md-select v-model="selectedRom" name="RomBin" @md-selected="onSelected">
+                <md-option v-for="rom in romList" :value="rom.location" :key="rom.name">
+                    {{rom.name}}
+                </md-option>
+            </md-select>
+        </md-field>
+    </div>
+    <div class="md-layout-item">
+        <md-field>
+            <label>IP Address</label>
+            <md-input v-model="ipAddress"></md-input>
+        </md-field>
+    </div>
+</div>
