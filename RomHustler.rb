@@ -216,6 +216,10 @@ class ROMS < HTTPServlet::AbstractServlet
 		html += "<select name='NetDimm'>"
 		html += "<option value='blank'></option>"
 		html += "<option value='manual'>Manual Entry</option>"
+		html += "<option value='10.0.0.1'>10.0.0.1</option>"
+		html += "<option value='10.0.0.2'>10.0.0.2</option>"
+		html += "<option value='192.168.14.1'>192.168.14.1</option>"
+		html += "<option value='192.168.14.2'>192.168.14.2</option>"
 		get_dhcp_hosts().each{ |host|
 			html += "<option value='#{host[1]}-#{host[0]}'>#{host[1]}</option>"
 		}
