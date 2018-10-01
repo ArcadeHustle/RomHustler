@@ -192,8 +192,6 @@ class ROMS < HTTPServlet::AbstractServlet
  def do_GET(req, res)
         if req.unparsed_uri == "/"
 		html = "<html><body>"
-                #html += "<br><img id=\"imageToSwap\" src=\"https://image.spreadshirtmedia.com/image-server/v1/compositions/110$
-		#Add file named hustle.jpg to root of RomBINS folder and it will be displayed on / of web page.
                 html += "<br><img id=\"imageToSwap\" src=\"roms/hustle.jpg\" height=\"300\" width=\"300\">"
 		html += "<br>Select the Platform type and game ROM<br>"
 		html += "<form action=\"/execute\" method=\"get\">" 
