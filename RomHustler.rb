@@ -204,7 +204,7 @@ class ROMS < HTTPServlet::AbstractServlet
                         files = Dir.glob("*/*").sort_by(&:downcase)
                         files.each{|rom|
 				if rom =~ /.jpg/
-					p "nope"
+					#p "nope"
 				else
 		                	html += "<option value=\"#{rom}\">#{rom}</option>"
 				end
