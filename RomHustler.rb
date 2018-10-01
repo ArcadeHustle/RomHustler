@@ -192,7 +192,7 @@ class ROMS < HTTPServlet::AbstractServlet
  def do_GET(req, res)
         if req.unparsed_uri == "/"
 		html = "<html><body>"
-                html += "<br><img id=\"imageToSwap\" src=\"roms/hustle.jpg\" height=\"300\" width=\"300\">"
+                html += "<br><img id=\"imageToSwap\" src=\"RomBINS/hustle.jpg\" height=\"300\" width=\"300\">"
 		html += "<br>Select the Platform type and game ROM<br>"
 		html += "<form action=\"/execute\" method=\"get\">" 
 		html += "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js\" type=\"text/javascript\"></script>"
